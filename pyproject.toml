@@ -19,6 +19,9 @@ classifiers = [
 ]
 dependencies = []
 
+[project.scripts]
+llm-output-diff = "llm_output_diff.__main__:main"
+
 [project.urls]
 Homepage = "https://github.com/Trysac/u102-llm-output-diff"
 Source = "https://github.com/Trysac/u102-llm-output-diff"
