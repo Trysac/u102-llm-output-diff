@@ -1,48 +1,42 @@
 # llm-output-diff
 
-[![PyPI version](https://img.shields.io/pypi/v/trysac-llm-output-diff)](https://pypi.org/project/trysac-llm-output-diff/)
-[![License: MIT](https://img.shields.io/pypi/l/trysac-llm-output-diff)](LICENSE)
-[![CI](https://github.com/Trysac/u102-llm-output-diff/actions/workflows/ci.yml/badge.svg)](https://github.com/Trysac/u102-llm-output-diff/actions/workflows/ci.yml)
+![Build](https://github.com/u102-llm-output-diff/actions/workflows/ci.yml/badge.svg)
 
-Diff two LLM outputs by JSON field, number and claim: RFC 6901 paths for structured replies, aligned sentences with changed numbers for prose
+Diff two LLM outputs by JSON field, number and claim: RFC 6901 paths for structured replies, aligned sentences with changed numbers for prose.
 
-## Problem
+## Installation
 
-Describe in two or three sentences the concrete problem this utility solves, who hits it, and what
-they do today without it. Replace this paragraph when the first real feature lands.
-
-## Install
-
-```sh
-pip install trysac-llm-output-diff
-# or
-uv add trysac-llm-output-diff
+```bash
+pip install llm-output-diff
 ```
-
-Requires Python 3.10 or newer. No runtime dependencies.
 
 ## Usage
 
 ```python
-import llm_output_diff
+from llm_output_diff import diff_outputs, format_report
 
-# normalize() trims surrounding whitespace and lower-cases the text.
-print(llm_output_diff.normalize("  Hello World "))  # -> "hello world"
-
-# Blank input is rejected explicitly instead of returning an empty string.
-try:
-    llm_output_diff.normalize("   ")
-except ValueError as exc:
-    print(f"rejected: {exc}")
+a = '{"metric": "revenue", "total": 100}'
+b = '{"metric": "revenue", "total": 105}'
+report = diff_outputs(a, b, rel_tol=0.01)
+print(format_report(report))
 ```
 
-## Documentation
+## Public API
 
-- [Architecture](docs/ARCHITECTURE.md) and [decisions](docs/decisions/)
-- [Testing](docs/TESTING.md) and [security](docs/SECURITY.md)
-- [Project record](docs/PROJECT.md) and [stack](docs/STACK.md)
-- [Changelog](CHANGELOG.md) and [contributing guide](CONTRIBUTING.md)
+- `diff_json(a: object, b: object, *, rel_tol: float = 0.0, max_changes: int = 1000, max_depth: int = 64) -> DiffReport`
+- `diff_text(a: str, b: str, *, similarity: float = 0.5, max_changes: int = 1000) -> DiffReport`
+- `diff_outputs(a: str, b: str, **kw: Any) -> DiffReport`: Automatically detects format, striping code fences.
+- `format_report(report: DiffReport, fmt: Literal['text', 'json'] = 'text') -> str`
 
-## License
+### Limits and Options
+- **Input Limit**: 200,000 characters maximum.
+- **Depth Limit**: 64 nested levels for JSON.
+- **Truncation**: Returns max 1000 changes.
+- **Numeric Tolerance**: `rel_tol` parameter controls `math.isclose` behavior.
 
-[MIT](LICENSE) (c) 2026 Miguel Gomez
+## Why not <best-known alternative>?
+
+Existing tools like `difflib` are line-based and cannot detect semantic changes across reworded prose. `deepdiff` supports JSON diffs but provides no specialized mode for prose, sentence alignment, or numeric pairing, which are critical for evaluating LLM outputs.
+
+## Security
+See [docs/SECURITY.md](docs/SECURITY.md).
