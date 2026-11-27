@@ -6,8 +6,10 @@ Diff two LLM outputs by JSON field, number and claim: RFC 6901 paths for structu
 
 ## Installation
 
+Not published to PyPI yet. Install it from GitHub:
+
 ```bash
-pip install llm-output-diff
+pip install "git+https://github.com/Trysac/u102-llm-output-diff"
 ```
 
 ## Usage
